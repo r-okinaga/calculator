@@ -2,14 +2,13 @@
 #構文規則
 #数値：[0-9]
 #演算子：+ - * / ( )
-#未実装 小数
 
 require "strscan"
 require 'test/unit'
 
 def main
     print "enter a formula\n"
-    formula = "(-21+2)+(-2*2)"
+    formula = "(-21.321+2)+(5/2)"
     token_array = devide_into_token(formula)
     p token_array
     reverse_polish_array = to_reverse_polish(token_array)
@@ -38,7 +37,7 @@ def devide_into_token(formula)
                 else
                     token_array << s[0]
                 end
-        when s.scan(/\d+/)
+        when s.scan(/\d+(\.\d+)?/)
             token_array << unary_ope + s[0]
             unary_ope = ""
             unary_ope_may = false
@@ -107,7 +106,7 @@ def calc(reverse_polish_array)
             l = stack.pop
             stack.push(l / r)
         else
-            stack.push(token.to_i)
+            stack.push(token.to_f)
         end
     }
     answer = stack[0]
