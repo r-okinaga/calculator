@@ -2,13 +2,14 @@
 #構文規則
 #数値：[0-9]
 #演算子：+ - * / ( )
+#正負の実数が計算可能
 
 require "strscan"
 require 'test/unit'
 
 def main
     print "enter a formula\n"
-    formula = "(-21.321+2)+(5/2)"
+    formula = "(-21.3aa+2)+(5/2)"
     token_array = devide_into_token(formula)
     p token_array
     reverse_polish_array = to_reverse_polish(token_array)
@@ -41,6 +42,8 @@ def devide_into_token(formula)
             token_array << unary_ope + s[0]
             unary_ope = ""
             unary_ope_may = false
+        else
+            raise "有効でない文字列が含まれています。"
         end
 
     end
