@@ -9,9 +9,8 @@ require 'test/unit'
 
 def main
     print "enter a formula\n"
-    formula = "(-21.3aa+2)+(5/2)"
+    formula = gets.chomp
     token_array = devide_into_token(formula)
-    p token_array
     reverse_polish_array = to_reverse_polish(token_array)
     answer = calc(reverse_polish_array)
     p formula + "=" + answer.to_s
