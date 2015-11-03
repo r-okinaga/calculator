@@ -1,8 +1,11 @@
 #計算機プログラム
-#
-#
+#構文規則
+#数値：[0-9]
+#演算子：+ - * / ( )
+#未実装 マイナスの整数 小数
 
 require "strscan"
+require 'test/unit'
 
 def main
     print "enter a formula\n"
