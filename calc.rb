@@ -2,15 +2,16 @@
 #構文規則
 #数値：[0-9]
 #演算子：+ - * / ( )
-#未実装 マイナスの整数 小数
+#未実装 小数
 
 require "strscan"
 require 'test/unit'
 
 def main
     print "enter a formula\n"
-    formula = gets.chomp
+    formula = "(-21+2)+(-2*2)"
     token_array = devide_into_token(formula)
+    p token_array
     reverse_polish_array = to_reverse_polish(token_array)
     answer = calc(reverse_polish_array)
     p formula + "=" + answer.to_s
@@ -20,9 +21,29 @@ def devide_into_token(formula)
 
     s = StringScanner.new(formula)
     token_array = Array.new
+    unary_ope_may = true
+    unary_ope = ""
 
     while !s.eos?  do
-        token_array << s.scan(/\d+|\*|\/|\+|\-|\(|\)/)
+        case
+        when s.scan(/\*|\/|\+|\)/)
+            unary_ope_may = false
+            token_array << s[0]
+        when s.scan(/\(/)
+            unary_ope_may = true
+            token_array << s[0]
+        when s.scan(/\-/)
+                if unary_ope_may then
+                    unary_ope = "-"
+                else
+                    token_array << s[0]
+                end
+        when s.scan(/\d+/)
+            token_array << unary_ope + s[0]
+            unary_ope = ""
+            unary_ope_may = false
+        end
+
     end
 
     token_array
@@ -92,4 +113,3 @@ def calc(reverse_polish_array)
     answer = stack[0]
 end
 main
-j
