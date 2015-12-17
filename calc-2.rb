@@ -11,10 +11,10 @@ def main
   print "enter a formula\n"
   formula = gets.chomp
   token_array = devide_into_token(formula)
-  stack = Array.new
-  reverse_polish_array = Array.new
-  reverse_polish_array = to_reverse_polish(token_array, stack, reverse_polish_array)
-  answer = calc(reverse_polish_array)
+#  reverse_polish_array = to_reverse_polish(token_array)
+#  reverse_polish_array = Parser.parse2(token_array)
+#  answer = calc(reverse_polish_array)
+  answer = Parser.parse2(token_array).to_i
   p formula + "=" + answer.to_s
 end
 
@@ -37,18 +37,129 @@ def devide_into_token(formula)
 
 end
 
-def to_reverse_polish(token_array, stack, reverse_polish_array)
+class String
+  def numeric?
+    self =~ /^[0-9]+$/
+  end
+end
 
+
+
+class Parser
+  class BinOp
+    def initialize(lhs, opr, rhs)
+      @lhs = lhs
+      @opr = opr
+      @rhs = rhs
+    end
+
+    def to_i
+      l = @lhs.to_i
+      r = @rhs.to_i
+
+      case @opr
+        when '+'
+          l + r
+
+        when '-'
+          l - r
+
+        when '*'
+          l * r
+
+        when '/'
+          l / r
+
+        else
+          raise
+      end
+    end
+
+  end
+
+  def self.parse2(token_array)
+    p = Parser.new
+    p.parse(token_array)
+  end
+
+  def parse(token_array)
+    @token_array = token_array
+
+    expression
+  end
+
+  def expression
+    v = term
+
+    while %w(+ -).include? token
+      v = BinOp.new v, next_token, term
+    end
+
+    v
+  end
+
+  def term
+    v = factor
+
+    while ['*', '/'].include? token
+      v = BinOp.new v, next_token, factor
+    end
+
+    v
+  end
+
+  def factor
+    case
+      when token.numeric?
+        next_token
+
+      when token == '('
+        next_token
+        v = expression
+        assert_and_next ')'
+        v
+
+      else
+        raise
+
+    end
+  end
+
+  private
+
+  def write(val)
+    @values << val
+  end
+
+  def token
+    @token_array.first
+  end
+
+  def next_token
+    @token_array.shift
+  end
+
+  def assert_and_next(s)
+    raise unless token == s
+    next_token
+  end
+end
+
+def to_reverse_polish(token_array)
+  stack = Array.new
+  reverse_polish_array = Array.new
   while 0 < token_array.size do
     token = token_array.shift
     if token == "("
-      to_reverse_polish(token_array, stack, reverse_polish_array)
+      factor = to_reverse_polish(token_array) #kou to shite atukau
+      while factor.any? do
+        reverse_polish_array << factor.shift
+      end
     elsif token == ")"
       while stack.any? do
         reverse_polish_array << stack.pop
       end
-      p calc(reverse_polish_array)
-      p reverse_polish_array
+      return reverse_polish_array
     elsif token == "*" or token == "/" then
       while 0 < stack.size && stack.last =~ /\*|\// do
         reverse_polish_array << stack.pop
